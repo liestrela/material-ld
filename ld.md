@@ -39,6 +39,10 @@ podem pular esses parágrafos e seguir o texto como um tutorial
 "passo-a-passo" de como montar os circuitos (ainda assim, recomendo
 muito que não ignore até a seção 5).
 
+Finalmente, números em base binária serão escritos com o prefixo $0b$,
+números em base hexadecimal serão escritos com o prefixo $0x$ e
+números em base decimais serão escritos sem prefixo.
+
 Enfim, enjoy it!
 
 # Conteúdo
@@ -49,6 +53,8 @@ Enfim, enjoy it!
 3. [Modelagem de Problema Prático](#modelagem-de-problema-prático)
 4. [Modelagem de Problema Prático 2: Electric Boogaloo](#modelagem-de-problema-prático-2-electric-boogaloo)
 5. [Display Hexadecimal de 7 segmentos](#display-hexadecimal-de-7-segmentos)
+6. [Somador Completo](#somador-completo)
+
 
 ## 0. Pré-requisitos **(!)**
 
@@ -332,3 +338,44 @@ algébrica dela. Usaremos o método de *Mapas-K* para fazer a
 simplificação
 
 (adicionar tabela verdade e explicação do mapa de karnaugh).
+
+## 6. Somador Completo
+
+Falando finalmente em aritmética, o primeiro dos componentes de
+aritmética que vamos implementar é o circuito *somador completo*. O
+somador completo é um circuito que implementa duas funções boolianas:
+a função $S$, que chamaremos de função *soma*, e a função $C$, que
+chamaremos de função *carry*. A função soma leva um par de bits na
+soma deles. Para todas os pares de bits exceto o par $(1,1)$, a soma é
+trivial: $S(0,0)=0$; $S(0,1)=1$; $S(1,0)=1$. Para $S(1,1)$, como não é
+possível representar o número $2$ utilizando somente um bit, definimos
+$S(1,1)=0$ e ao mesmo tempo $C(1,1)=1$. Para todos os outros pares
+$(A,B)$, temos $C(A,B)=0.$
+
+Ficamos com a seguinte tabela-verdade:
+
+| A | B | C | S |
+|---|---|---|---|
+| 0 | 0 | 0 | 0 |
+| 0 | 1 | 0 | 1 |
+| 1 | 0 | 0 | 1 |
+| 1 | 1 | 1 | 0 |
+
+De fato,
+\begin{align}
+	&0+0=0=0b00 \\
+	&0+1=1+0=1=0b01 \\
+	&1+1=2=0b10
+\end{align}
+
+As expressões para as funções $S$ e $C$ podem ser deduzidas
+imediatamente pela tabela-verdade, pelo método de mintermos ou usando
+mapas-K. Ficamos com o seguinte:
+\begin{align}
+	&S(A,B)=A \oplus B \\
+	&C(A,B)=AB
+\end{align}
+
+O circuito final do somador fica da seguinte forma:
+
+(imagem do somador completo no quartus)
