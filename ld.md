@@ -65,13 +65,16 @@ introduçãozinha.
 
 Basicamente, a álgebra booliana que vamos precisar aqui é basicamente
 um conjunto de regras que vale pra algumas operações no conjunto
-$\{0,1\}$. Essas regras são definidas de modo a juntar as principais
-propriedades de operações entre conjuntos, no caso, união, interseção e
-complemento. No contexto de lógica digital, é mais comum usar os
-conectivos lógicos pra se referir a estas operações, usando *OU/OR*
-para união, *E/AND* para interseção e *NÃO/NOT* para complemento.
+$\{0,1\}$. Durante esse texto, muitas vezes um valor desse conjunto
+será chamado de *bit* (binary digit). Essas regras são definidas de 
+modo a juntar as principais propriedades de operações entre conjuntos,
+no caso, união, interseção e complemento. No contexto de lógica digital, 
+é mais comum usar os conectivos lógicos pra se referir a estas operações,
+usando *OU/OR* para união, *E/AND* para interseção e *NÃO/NOT* para complemento.
 
-(imagem de união interseção e complemento)
+[![OR](img/or.png)](img/or.png)
+[![AND](img/and.png)](img/and.png)
+[![NOT](img/not.png)](img/not.png)
 
 As duas coisas são equivalentes porque a união de dois conjuntos $A$ e
 $B$ é o conjunto dos elementos que pertencem a $A$ **ou** a $B$, não
