@@ -32,6 +32,13 @@ no YouTube e o [Stephen Brown, Fundamentals of Digital
 Logic](https://www.amazon.com/Fundamentals-Digital-Logic-Verilog-Design/dp/0073380547),
 que vai bem além desse assunto.
 
+Ressalva relevante: muitos dos projetos pedidos na disciplina do 
+laboratório (além de uma porção boa da teoria) são explicados em vídeos 
+gravados durante a pandemia pelo professor Denis Wolf. Recomenda-se
+fortemente a visualização de seus vídeos durante o 1° semestre, por
+fornecerem uma base muito boa em Lógica Digital e suas aplicações.
+Link [aqui](https://youtube.com/playlist?list=PL400nT9WA9li9LjGXqFKlHqRZxryRAomV&si=WBcBO85Vp1PQvUJz)
+
 **Importante:** Todas as seções têm partes marcadas com **(!)**.
 Isso indica que essas partes explicam um pouco mais profundamente
 sobre aquele assunto/problema. Para os desesperados:
@@ -53,7 +60,8 @@ Enfim, enjoy it!
 3. [Modelagem de Problema Prático](#modelagem-de-problema-prático)
 4. [Modelagem de Problema Prático 2: Electric Boogaloo](#modelagem-de-problema-prático-2-electric-boogaloo)
 5. [Display Hexadecimal de 7 segmentos](#display-hexadecimal-de-7-segmentos)
-6. [Somador Completo](#somador-completo)
+6. [Half Adder](#6-half-adder)
+7. [Somador de 4 bits](#7-somador-de-4-bits)
 
 
 ## 0. Pré-requisitos **(!)**
@@ -147,9 +155,38 @@ das operações podemos simplificar essas funções, de modo a usar menos
 portas lógicas pra obter a mesma saída para as funções. Mais para
 frente vamos usar métodos mais eficientes pra simplificar funções
 boolianas (poderemos garantir que a função vai terminar o mais
-simplifica possível).
+simplificada possível).
 
-(falar de tabela-verdade)
+Como usar o modelo da lógica booliana para abordar problemas? Segue
+um algoritmo básico de como navegar essa abordagem.
+
+Inicialmente, o que você deve fazer é separar inputs de 
+outputs, aka o que entra e sai, respectivamente. Cada um deles deve 
+ser considerado como um bit; por exemplo, se $A$ é um input, ele pode
+assumir $A = 1$ ou  $A = 0$.  Então, o que resta é achar as relações 
+lógicas entre inputs e outputs (dadas pelas portas) as quais validam
+nosso modelo. Para tal, a ferramenta mais básica é a tabela-verdade.
+
+Tabelas-Verdade (TV's para os íntimos) são tabelas em que as colunas
+indicam nossas variáveis, e as linhas, os possíveis valores que 
+as variáveis podem assumir. Seguimos a seguinte fórmula para montagem:
+$l = 2^{i}$, sendo $l$ o número de linhas, e $i$, o n° de inputs.
+Essa fórmula advém do fato de que cada input pode assumir $1$ ou $0$.
+A sua lógica de implementação acontecerá nos outputs, onde você decidirá
+como o circuito responderá a cada combinação de inputs possível, podendo
+ser $1$, $0$, ou $X$ = Don't Care (tanto faz $0$ ou $1$). Sendo $T$ uma 
+sequência dividida em 2 por $0$'s e $1$'s que começa com $T = l$, o padrão
+é, a cada input novo, dividir $T$ por $2$ e repeti-lo até preencher $l$.
+Segue um exemplo de uma TV e o circuito correspondente:
+
+[![Exemplo de TV](img/truth_table.jpg)](img/truth_table.jpg)
+
+onde $T$ reduz entre $A,B,C$ para $8,4,2$, respectivamente. É importante
+sempre seguir esse padrão. Agora que você já sabe como concretizar 
+problemas a esse tipo de lógica, fica a pergunta: como eu tiro um 
+circuito de uma TV? Para isso, os 2 métodos passados na disciplina são:
+simplificação algébrica (terrível), e mapa-de-Karnaugh (preferível).
+Exibiremos como fazer ambos nas seções seguintes.
 
 ## 1. Configuração do Quartus Prime
 
@@ -335,18 +372,37 @@ Para representar o dígito hexadecimal, usaremos o display de 7
 segmentos disponível nas FPGAs Cyclone IV e V. A cada segmento do
 display associaremos uma função booliana que leva os dígitos binários
 de entrada ao sinal daquele segmento, de modo a desenhar todos os
-dígitos hexadecimais. A melhor forma de fazer isso é construir uma
-tabela-verdade com todos os valores possíveis e extrair a expressão
-algébrica dela. Usaremos o método de *Mapas-K* para fazer a
-simplificação
+dígitos hexadecimais. Para atingir esse fim, será construída uma
+tabela-verdade com todos os valores possíveis para extrair a expressão
+algébrica dela; lembrando que teremos 4 inputs (números de 0 a 15
+são representados por 4 bits) e 7 outputs.
+
+[![Tabela do Display](img/7_display.png)](img/7_display.png)
 
 (adicionar tabela verdade e explicação do mapa de karnaugh).
 
-## 6. Somador Completo
+Para resolver essa tabela e extrair um circuito, são possíveis 2 
+soluções: a primeira é projetar uma matriz de inputs por outputs,
+sendo que cada output possui uma logic gate OR que receberá todos os inputs
+que ativam-no. A segunda, mais otimizada porém técnica, envolve
+usar o método de K-maps (mapa de Karnough), mencionado previamente.
+
+A explicação desse método é um pouco longa e demorada, então vale
+mais a pena aqui recomendar a leitura dele no site
+[Bê-á-Bá](https://de-abreu.github.io/be-a-ba/) da lógica digital,
+desenvolvido por veteranos da 024. Dado que você já tenha lido e
+entendido, provavelmente perceberá que será necessário fazer
+um mapa de 4 variáveis para cada um dos sete segmentos. Isso é
+um saco, mas é uma ótima maneira de praticar e ficar rápido nisso
+(o que você precisará, confie), então recomenda-se fazê-lo. Para 
+um gabarito, um site bom é o 
+[Electrical Technology](https://www.electricaltechnology.org/2018/05/bcd-to-7-segment-display-decoder.html)
+
+## 6. Half Adder
 
 Falando finalmente em aritmética, o primeiro dos componentes de
-aritmética que vamos implementar é o circuito *somador completo*. O
-somador completo é um circuito que implementa duas funções boolianas:
+aritmética que vamos implementar é o circuito *half adder*. O
+somador 'parcial' é um circuito que implementa duas funções booleanas:
 a função $S$, que chamaremos de função *soma*, e a função $C$, que
 chamaremos de função *carry*. A função soma leva um par de bits na
 soma deles. Para todas os pares de bits exceto o par $(1,1)$, a soma é
@@ -379,6 +435,31 @@ mapas-K. Ficamos com o seguinte:
 	&C(A,B)=AB
 \end{align}
 
-O circuito final do somador fica da seguinte forma:
+O circuito final do half adder fica da seguinte forma:
 
-(imagem do somador completo no quartus)
+[![Half Adder](img/half_adder.png)](img/hlf_adder.png)
+
+## 7. Somador de 4 bits
+
+Esse será o primeiro projeto (na disciplina) em que você fará o design
+de um circuito que envolva um planejamento e projeção mais técnicos.
+Nada muito exorbitante, mas esse exemplo introduz como criar e 
+explorar sistemas maiores a partir de menores, o que é o dever
+de qualquer bom cientista da computação.
+
+Em suma, usaremos o bloco do Somador Completo como unidade de soma. 
+Para conseguir transformar um projeto em um bloco lógico no Quartus, siga 
+[este](https://youtu.be/Z6iYVo8p9A0?si=i41vEdMiFtfpzvij) tutorial.
+A partir disso, nosso somador de 4 bits irá imitar o algoritmo básico
+de soma que aprendemos no fundamental I (e usamos até hoje): somamos
+os algarismos na mesma casa decimal (no nosso caso, binária), considerando
+carry-in da soma passada e propagando carry-out (se houver).
+
+Primeiro, é necessário criar um Full Adder. Ele nada mais é do que
+um Half Adder que suporta carry-in. Para tal fim, construa a TV com esse
+input adicionado e efetue o Karnough, e salve esse projeto. Depois disso,
+use o bloco lógico dele seguindo a lógica descrita no parágrafo anterior,
+terminando com um circuito com essa cara:
+
+[![4 Bits Adder](img/4-bit-adder.jpg.png)](img/4-bit-adder.jpg.png)
+
