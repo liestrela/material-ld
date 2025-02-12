@@ -37,7 +37,7 @@ laboratório (além de uma porção boa da teoria) são explicados em vídeos
 gravados durante a pandemia pelo professor Denis Wolf. Recomenda-se
 fortemente a visualização de seus vídeos durante o 1° semestre, por
 fornecerem uma base muito boa em Lógica Digital e suas aplicações.
-Link [aqui](https://youtube.com/playlist?list=PL400nT9WA9li9LjGXqFKlHqRZxryRAomV&si=WBcBO85Vp1PQvUJz)
+Link [aqui](https://youtube.com/playlist?list=PL400nT9WA9li9LjGXqFKlHqRZxryRAomV)
 
 **Importante:** Todas as seções têm partes marcadas com **(!)**.
 Isso indica que essas partes explicam um pouco mais profundamente
@@ -449,7 +449,7 @@ de qualquer bom cientista da computação.
 
 Em suma, usaremos o bloco do Somador Completo como unidade de soma. 
 Para conseguir transformar um projeto em um bloco lógico no Quartus, siga 
-[este](https://youtu.be/Z6iYVo8p9A0?si=i41vEdMiFtfpzvij) tutorial.
+[este tutorial](https://youtube.com/watch?v=Z6iYVo8p9A0).
 A partir disso, nosso somador de 4 bits irá imitar o algoritmo básico
 de soma que aprendemos no fundamental I (e usamos até hoje): somamos
 os algarismos na mesma casa decimal (no nosso caso, binária), considerando
