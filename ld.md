@@ -60,7 +60,7 @@ Enfim, enjoy it!
 3. [Modelagem de Problema Prático](#modelagem-de-problema-prático)
 4. [Modelagem de Problema Prático 2: Electric Boogaloo](#modelagem-de-problema-prático-2-electric-boogaloo)
 5. [Display Hexadecimal de 7 segmentos](#display-hexadecimal-de-7-segmentos)
-6. [Half Adder](#6-half-adder)
+6. [Somador Completo](#somador-completo)
 7. [Somador de 4 bits](#7-somador-de-4-bits)
 
 
@@ -398,10 +398,12 @@ um saco, mas é uma ótima maneira de praticar e ficar rápido nisso
 um gabarito, um site bom é o 
 [Electrical Technology](https://www.electricaltechnology.org/2018/05/bcd-to-7-segment-display-decoder.html)
 
-## 6. Half Adder
+## 6. Somador Completo
 
 Falando finalmente em aritmética, o primeiro dos componentes de
-aritmética que vamos implementar é o circuito *half adder*. O
+aritmética que vamos implementar é o circuito *somador completo*
+(full-adder). O somador completo é construído utilizando dois
+*somadores parciais* (half-adder), portanto, começaremos por este. O
 somador 'parcial' é um circuito que implementa duas funções booleanas:
 a função $S$, que chamaremos de função *soma*, e a função $C$, que
 chamaremos de função *carry*. A função soma leva um par de bits na
@@ -413,12 +415,12 @@ $(A,B)$, temos $C(A,B)=0.$
 
 Ficamos com a seguinte tabela-verdade:
 
-| A | B | C | S |
-|---|---|---|---|
-| 0 | 0 | 0 | 0 |
-| 0 | 1 | 0 | 1 |
-| 1 | 0 | 0 | 1 |
-| 1 | 1 | 1 | 0 |
+| $A$ | $B$ | $C$ | $S$ |
+| --- | --- | --- | --- |
+| $0$ | $0$ | $0$ | $0$ |
+| $0$ | $1$ | $0$ | $1$ |
+| $1$ | $0$ | $0$ | $1$ |
+| $1$ | $1$ | $1$ | $0$ |
 
 De fato,
 \begin{align}
@@ -437,7 +439,45 @@ mapas-K. Ficamos com o seguinte:
 
 O circuito final do half adder fica da seguinte forma:
 
+(adicionar imagem no quartus)
 [![Half Adder](img/half_adder.png)](img/hlf_adder.png)
+
+**(!)** A ideia da função carry está relacionada com o sistema
+posicional de representação de números inteiros que estamos usando.
+A expressão $N=0ba_1 a_0$ que utilizamos para representar um número na
+base $2$, de fato significa $N=a_1\cdot2 + a_0$, onde $a_1$ e $a_0$
+são valores em $\{0,1\}$. O papel do carry
+é garantir que a soma esteja bem definida em casos como $S(1,1)$. Já
+que o número 2 não pode ser representado por nenhum dos coeficientes $a_1$ e
+$a_0$, podemos usar o fato de que $2 = 1\cdot2 + 0 = 0b10$ para
+"passar" o bit excedente adiante, com $a_1=1$ e $a_0=0$. A partir de
+agora, podemos entender o somador parcial como uma função $HA(A,B)$,
+que leva um par de bits em um vetor de dois bits cujas componentes indicam a
+representação posicional do resultado da soma parcial.
+
+**(!)** Note que o maior valor de $N=a_1\cdot2 + a_0$ é $3=0b11$, que ocorre
+quando $a_1=a_0=1$ não é resultado de nenhuma soma parcial da
+forma que definimos. Para considerar este caso, devemos adicionar uma
+nova variável ao nosso circuito, que deve ser somada ao resultado
+final. Essa nova função "extendida" é o *somador completo*. A
+introduziremos a seguir e exploraremos um uso mais geral dessa nova
+função na próxima seção.
+
+O somador completo é uma função de três variáveis $FA(A,B,C_{in})$ que
+leva suas três variáveis na soma delas. A terceira variável $C_{in}$ é
+chamada de *carry_in*, por motivos que exploraremos melhor na próxima
+seção. A tabela verdade do somador completo é a seguinte:
+
+| $A$ | $B$ | $C_{in}$ | $C$ | $S$ |
+| --- | --- | ---      | --- | --- |
+|  0  |  0  |     0    |  0  |  0  |
+|  0  |  0  |     1    |  0  |  1  |
+|  0  |  1  |     0    |  0  |  1  |
+|  0  |  1  |     1    |  1  |  0  |
+|  1  |  0  |     0    |  0  |  1  |
+|  1  |  0  |     1    |  1  |  0  |
+|  1  |  1  |     0    |  1  |  0  |
+|  1  |  1  |     1    |  1  |  1  |
 
 ## 7. Somador de 4 bits
 
@@ -462,4 +502,3 @@ use o bloco lógico dele seguindo a lógica descrita no parágrafo anterior,
 terminando com um circuito com essa cara:
 
 [![4 Bits Adder](img/4-bit-adder.jpg.png)](img/4-bit-adder.jpg.png)
-
