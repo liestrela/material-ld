@@ -8,38 +8,36 @@ lógicos simples, implementando os componentes de uma unidade lógica e
 aritmética, com um extra de um tutorial para implementação desses 
 circuitos em
 [FPGAs](https://pt.wikipedia.org/wiki/Arranjo_de_porta_program%C3%A1vel_em_campo),
-dando uma  atenção exclusiva aos modelos Cyclone IV e V da Altera, e fazendo toda a implementação no ambiente Intel Quartus Prime.
+dando uma  atenção exclusiva aos modelos Cyclone IV e V da Altera e fazendo toda a implementação no ambiente Intel Quartus Prime.
 
-Os únicos pré-requisitos do texto são: conhecer as operações
-aritméticas que vamos implementar (isso eu não irei revisar) e ter
+Os únicos pré-requisitos do texto são conhecer as operações
+aritméticas básicas (isto eu não irei revisar) e ter
 noções básicas de álgebra booliana. Sobre o último, farei uma breve
-(re)visão no começo do texto e vou explicando coisas mais particulares
-conforme for necessário.
+(re)visão no começo do texto e irei explicando detalhes mais sutis e
+particulares no decorrer do texto.
 
 A abordagem comicamente específica e estranha desse texto se dá
 pelo fato de que esse texto foi escrito *especialmente* para servir de
-material auxiliar para os alunos do curso de Prática em Lógica
-Digital, então todas as seções desse texto estão *necessariamente*
+material auxiliar para os alunos de um curso de Prática em Lógica
+Digital no ICMC/USP, então todas as seções desse texto estão
 associadas a um trabalho/aula do curso. Por esse mesmo motivo escolhi
 considerar algumas noções de lógica digital como pré-requisito, já que
 o curso de Introdução à Lógica Digital é dado simultaneamente a esse.
 Se você não está fazendo esse curso e caiu aqui de paraquedas,
-provavelmente não vai gostar muito desse texto, então recomendo o
+provavelmente não vai gostar muito desse texto. Neste caso, recomendo o
 [blog do Coert
 Vonk](https://coertvonk.com/category/hw/building-math-circuits) sobre
 o assunto, alguns vídeos do [Ben Eater](https://www.youtube.com/watch?v=wvJc9CZcvBc)
-no YouTube e o [Stephen Brown, Fundamentals of Digital
+no YouTube e a referência [Stephen Brown, Fundamentals of Digital
 Logic](https://www.amazon.com/Fundamentals-Digital-Logic-Verilog-Design/dp/0073380547),
-que vai bem além desse assunto.
+que vai bem além no assunto.
 
-Ressalva relevante: muitos dos projetos pedidos na disciplina do 
-laboratório (além de uma porção boa da teoria) são explicados em vídeos 
-gravados durante a pandemia pelo professor Denis Wolf. Recomenda-se
-fortemente a visualização de seus vídeos durante o 1° semestre, por
-fornecerem uma base muito boa em Lógica Digital e suas aplicações.
-Link [aqui](https://youtube.com/playlist?list=PL400nT9WA9li9LjGXqFKlHqRZxryRAomV)
+**Aviso importante**: Muitos dos projetos do curso de Prática em Lógica Digital
+(além de uma boa porção da teoria) também são explicados em vídeos 
+gravados durante a pandemia de 2020 pelo professor Denis Wolf. Você pode assistir
+essas aulas [nesta playlist do YouTube](https://youtube.com/playlist?list=PL400nT9WA9li9LjGXqFKlHqRZxryRAomV).
 
-**Importante:** Todas as seções têm partes marcadas com **(!)**.
+**Aviso importante$\mathbf{^2}$**: As seções do texto têm partes marcadas com **(!)**.
 Isso indica que essas partes explicam um pouco mais profundamente
 sobre aquele assunto/problema. Para os desesperados:
 podem pular esses parágrafos e seguir o texto como um tutorial
@@ -48,7 +46,7 @@ muito que não ignore até a seção 5).
 
 Finalmente, números em base binária serão escritos com o prefixo $0b$,
 números em base hexadecimal serão escritos com o prefixo $0x$ e
-números em base decimais serão escritos sem prefixo.
+números em base decimal serão escritos sem prefixo.
 
 Enfim, enjoy it!
 
@@ -66,25 +64,24 @@ Enfim, enjoy it!
 
 ## 0. Pré-requisitos **(!)**
 
-O que se tem para falar de pré-requisito aqui é basicamente
-o que é dado no início do curso de Introdução à Lógica Digital
-(essencialmente, o básico de álgebra booliana). Então aí vai uma
-introduçãozinha.
+Como já foi dito no prefácio do texto, os pré-requisitos para esse texto
+são conhecer e entender as operações aritméticas básicas (e a raíz quadrada)
+e álgebra booliana instrumental. Esta seção tem como objetivo somente introduzir os
+conceitos básicos de álgebra booliana.
 
-Basicamente, a álgebra booliana que vamos precisar aqui é basicamente
-um conjunto de regras que vale pra algumas operações no conjunto
-$\{0,1\}$. Durante esse texto, muitas vezes um valor desse conjunto
-será chamado de *bit* (binary digit). Essas regras são definidas de 
-modo a juntar as principais propriedades de operações entre conjuntos,
-no caso, união, interseção e complemento. No contexto de lógica digital, 
-é mais comum usar os conectivos lógicos pra se referir a estas operações,
-usando *OU/OR* para união, *E/AND* para interseção e *NÃO/NOT* para complemento.
+Basicamente, a álgebra booliana que vamos precisar aqui é um conjunto 
+de regras que vale pra algumas operações no conjunto
+$\{0,1\}$. Daqui em diante, um elemento desse conjunto será chamado de *bit*,
+do inglês, *binary digit*. Essas regras são definidas de modo a "capturar" as principais
+propriedades de operações entre conjuntos (reunião, interseção e complemento). 
+No contexto de lógica digital, é mais comum usar os conectivos lógicos pra se referir a estas operações,
+usando *OU/OR* para a reunião, *E/AND* para a interseção e *NÃO/NOT* para o complemento.
 
 [![OR](img/or.png)](img/or.png)
 [![AND](img/and.png)](img/and.png)
 [![NOT](img/not.png)](img/not.png)
 
-As duas coisas são equivalentes porque a união de dois conjuntos $A$ e
+As duas coisas são equivalentes porque a reunião de dois conjuntos $A$ e
 $B$ é o conjunto dos elementos que pertencem a $A$ **ou** a $B$, não
 exclusivamente (ou seja, o elemento pode pertencer aos dois), a
 interseção entre $A$ e $B$ é o conjunto dos elementos que pertencem a
@@ -92,40 +89,43 @@ $A$ **e** a $B$ e o complemento de um conjunto $A$ é o conjunto dos
 elementos de um conjunto universo que **não** pertencem a $A$. Durante
 todo o texto vamos usar o símbolo $+$ pra representar a operação *OR*
 e o símbolo $\cdot$ pra representar a operação *AND*. O complementar
-de um valor $a$, ou seja, um valor aplicado na operação *NOT* vai ser
+de um valor $a$, ou seja, um valor aplicado na operação *NOT* será
 denotado por $\overline{a}$.
 
-A seguir estão as principais regras das operações citadas (você vai
-encontrar isso em qualquer livro de lógica digital):
+A seguir estão as principais regras das operações citadas (você pode
+encontrá-las em qualquer livro de lógica digital).
+
+Para todo bit $x$, vale:
 
 1. Se $x=0$, então $\overline{x}=1$
 2. Se $x=1$, então $\overline{x}=0$
+3. $x \cdot 0 = 0$
+4. $x + 1 = 1$
+5. $x \cdot 1 = x$
+6. $x + 0 = x$
+7. $x \cdot x = x$
+8. $x + x = x$
+9. $x \cdot \overline{x} = 0$
+10. $x + \overline{x} = 1$
+11. $\overline{\overline{x}} = x$
 
-Para $x$ sendo $0$ ou $1$:
+Na prática, a operação *NOT* inverte o valor de um bit.
 
-1. $x \cdot 0 = 0$
-2. $x + 1 = 1$
-3. $x \cdot 1 = x$
-4. $x + 0 = x$
-5. $x \cdot x = x$
-6. $x + x = x$
-7. $x \cdot \overline{x} = 0$
-8. $x + \overline{x} = 1$
-9. $\overline{\overline{x}} = x$
+Note que para toda regra desse tipo, você pode
+trocar $0$ por $1$, $\cdot$ por $+$ e a regra continua
+valendo, e vice-versa. Este é o princípio de dualidade.
 
-E note que pra toda regrinha desse tipo, você pode
-trocar $0$ por $1$, $\cdot$ por $+$ e vice-versa e a regra continua
-valendo. Isso é o princípio de dualidade.
-
-Além dessas regras, as operações são comutativas (a ordem dos fatores
-não importa) e também são associativas (não importa onde você coloca
-os parênteses). E também são distributivas, mas diferente de números
+Além dessas regras, temos que as operações *OR* e *AND* são comutativas
+(a ordem dos fatores não importa) e também são associativas (não importa onde você coloca
+os parênteses). Elas também são distributivas, mas diferente da soma e produto de números
 reais, a soma também distribui sobre o produto, ou seja, pra todos os
-$x$, $y$ e $z$ sendo $0$ ou $1$, vale tanto $x \cdot (y+z) = x \cdot y + x
+bits $x$, $y$ e $z$, vale tanto $x \cdot (y+z) = x \cdot y + x
 \cdot z$ quanto $x+(y \cdot z) = (x+y) \cdot (x+z)$.
 
-Pra terminar, vão aí algumas últimas regras menos óbvias que podem ser
-úteis:
+Para terminar, vão aí algumas propriedades menos óbvias que podem ser
+úteis.
+
+Para todos os bits $x$, $y$ e $z$, vale:
 
 1. $x+x \cdot y = x$ (Absorção)
 2. $x \cdot y + x \cdot \overline{y} = x$ (Combinação)
@@ -133,64 +133,98 @@ Pra terminar, vão aí algumas últimas regras menos óbvias que podem ser
 4. $x \cdot y + y \cdot z + \overline{x} \cdot z = x \cdot y +
 \overline{x} \cdot z$ (Consenso)
 
-E não esqueça que pra cada uma dessas existe uma equivalente trocando
-$+$ por $\cdot$ e vice-versa.
+Novamente, para cada uma dessas propriedades existe uma outra equivalente
+obtida através do princípio de dualidade.
 
 Esse modelo matemático é útil pra projetar circuitos digitais porque
-você vai trabalhar com sinais binários (se atribui os símbolos 0 e 1 a
-eles, por convenção), e o que se tem para trabalhar são as portas
-lógicas, que são basicamente componentes eletrônicos que tem o
-comportamento dessas operações que acabamos de ver.
+trabalheremos com sinais binários (aos quais se atribui os símbolos 0 e 1,
+por convenção), e o que se tem para trabalhar são as portas
+lógicas, que são componentes lógicos que têm o comportamento das operações
+que apresentamos. Daqui em diante, trataremos operações binárias e portas
+lógicas como uma única coisa.
 
-Dessas portas lógicas mais básicas se pode criar outras portas lógicas
-úteis em várias situações, por exemplo, a *XOR* (OU-exclusivo), que é
+Dessas portas lógicas básicas, pode-se criar outras portas lógicas
+úteis em várias situações, como por exemplo, a *XOR* (*OU-exclusivo*), que é
 definida por $x \oplus y = \overline{x} \cdot y + x \cdot
-\overline{y}$. Vamos usar bastante essa porta lógica.
+\overline{y}$.
 
-A ideia de termos esse modelo matemático é poder modelar uma solução
-pra um problema usando funções boolianas, que são basicamente arranjos
-dessas operações que definimos em um número qualquer de variáveis para
-termos uma ou mais saídas que resolvem o problema. Com as propriedades
-das operações podemos simplificar essas funções, de modo a usar menos
-portas lógicas pra obter a mesma saída para as funções. Mais para
-frente vamos usar métodos mais eficientes pra simplificar funções
-boolianas (poderemos garantir que a função vai terminar o mais
-simplificada possível).
+As portas lógicas que usaremos muitas vezes serão ilustradas usando suas
+representações em blocos. Para conhecer as figuras de algumas portas lógicas
+comuns, acesse [a página da Wikipédia sobre portas lógicas](https://en.wikipedia.org/wiki/Logic_gate#Symbols).
 
-Como usar o modelo da lógica booliana para abordar problemas? Segue
-um algoritmo básico de como navegar essa abordagem.
+Daqui em diante, denotaremos $x \cdot y$ por $xy$.
 
-Inicialmente, o que você deve fazer é separar inputs de 
-outputs, aka o que entra e sai, respectivamente. Cada um deles deve 
-ser considerado como um bit; por exemplo, se $A$ é um input, ele pode
-assumir $A = 1$ ou  $A = 0$.  Então, o que resta é achar as relações 
-lógicas entre inputs e outputs (dadas pelas portas) as quais validam
-nosso modelo. Para tal, a ferramenta mais básica é a tabela-verdade.
+A principal aplicação destas definições que apresentamos é modelar a solução
+de uum problema usando funções boolianas, que são fundamentalmente combinações
+destas operações que definimos sobre um número qualquer de variáveis com uma
+saída que satisfaça a solução de um determinado prolema. Através das propriedades
+das portas lógicas, podemos simplificar as expressões dessas funções, de modo a usar menos
+portas lógicas pra obter a mesma saída para as funções. Mais adiante
+usaremos métodos mais eficientes para simplificar expressões de funções
+boolianas, de modo que poderemos garantir que a expressão está na sua forma mais
+simplificada.
 
-Tabelas-Verdade (TV's para os íntimos) são tabelas em que as colunas
-indicam nossas variáveis, e as linhas, os possíveis valores que 
-as variáveis podem assumir. Seguimos a seguinte fórmula para montagem:
-$l = 2^{i}$, sendo $l$ o número de linhas, e $i$, o n° de inputs.
-Essa fórmula advém do fato de que cada input pode assumir $1$ ou $0$.
-A sua lógica de implementação acontecerá nos outputs, onde você decidirá
-como o circuito responderá a cada combinação de inputs possível, podendo
-ser $1$, $0$, ou $X$ = Don't Care (tanto faz $0$ ou $1$). Sendo $T$ uma 
-sequência dividida em 2 por $0$'s e $1$'s que começa com $T = l$, o padrão
-é, a cada input novo, dividir $T$ por $2$ e repeti-lo até preencher $l$.
-Segue um exemplo de uma TV e o circuito correspondente:
+Dado um problema, o que deve ser feito primeiro é a separação de bits de entrada e 
+bits de saída. Cada saída será definida por uma função booliana, que pode ter como
+variáveis alguns dos bits de entrada ou não. Em seguida, uma maneira de organizar e
+determinar qual deve ser o comportamento de cada uma das funções de saída, pode-se usar
+uma ferramenta chamada *tabela-verdade*, que consiste em uma tabela com uma coluna para
+cada entrada e saída e $2^n$ linhas, onde $n$ é o número de entradas. O objetivo é preencher
+cada linha com uma combinação possível de entradas e descrever qual deve ser o valor de cada
+uma das saídas dada esta combinação de entrada. O número de linhas se dá pelo fato de que
+o número de combinação possíveis de $n$ bits é $2^n$ (princípio fundamental de contagem).
 
-[![Exemplo de TV](img/truth_table.jpg)](img/truth_table.jpg)
+[![Exemplo de tabela verdade](img/truth_table.jpg)](img/truth_table.jpg)
 
-onde $T$ reduz entre $A,B,C$ para $8,4,2$, respectivamente. É importante
-sempre seguir esse padrão. Agora que você já sabe como concretizar 
-problemas a esse tipo de lógica, fica a pergunta: como eu tiro um 
-circuito de uma TV? Para isso, os 2 métodos passados na disciplina são:
-simplificação algébrica (terrível), e mapa-de-Karnaugh (preferível).
-Exibiremos como fazer ambos nas seções seguintes.
+Uma vez construída a tabela verdade do problema, podemos definir a função booliana de
+uma saída como uma soma da combinação de entradas que produz o valor $1$ nesta saída.
+No exemplo da figura acima, temos que $Z(A,B,C) = A \overline{B} C + AB\overline{C} +
+ABC$. Através das propriedades das operações de soma e produto, temos que $Z =
+AC(B+\overline{B})+AB\overline{C}$ (distributividade), então temos que $Z = AC+AB\overline{C}
+= A(B\overline{C}+C) = A(B+C) = AB+AC$, como mostra o circuito lógico em blocos na figura.
 
 ## 1. Configuração do Quartus Prime
 
-(fazer)
+Todos os circuitos que fizermos durante o texto serão projetados no Quartus Prime com o intuito
+de implementá-los nas FPGAs Cyclone IV e V disponíveis nos laboratórios do ICMC-6. O Quartus Prime
+é um software da Intel que possui ferramentas de design de circuitos lógicos em blocos e de sintetização
+desses circuitos, com extensões para as FPGAs Cyclone. Você pode baixar a versão gratuita do Quartus Prime 
+no [website da Intel](https://www.intel.com.br/content/www/br/pt/products/details/fpga/development-tools/quartus-prime/resource.html).
+
+Após a instalação do Quartus Prime, devemos criar um novo projeto para trabalharmos. A cada trabalho/aula, deve-se
+criar um novo projeto. Não costuma ser boa ideia utilizar um único projeto do Quartus para todos os trabalhos do curso.
+Para criar um novo projeto, abra o Quartus e clique em **New Project Wizard**.
+
+[![New Project Wizard](img/new_project_wizard.jpg)](img/new_project_wizard.jpg)
+
+Depois disso, clique em **Next** e insira o nome do projeto e a pasta onde o projeto será armazenado.
+**Importante**: O Quartus Prime por padrão escolhe uma pasta protegida do sistema para armazenar o projeto.
+Altere essa pasta e escolha uma pasta dos seus documentos ou área de trabalho, por exemplo.
+
+[![Project Name](img/project_name.jpg)](img/project_name.jpg)
+
+Mantenha todas as configurações como estão até chegar na tela chamada **Family, Device & Board Settings**.
+Nesta tela, você deve selecionar o modelo de FPGA que você está utilizando na seção **Available Devices**,
+podendo pesquisar pelo modelo na caixa de busca **Name filter**. No momento em que este texto foi escrito,
+as duas FPGAs disponíveis nos laboratórios do ICMC são a Altera Cyclone IV (placa grande) e a Altera Cyclone V
+(placa pequena). Para facilitar, seguem os códigos de cada um desses modelos:
+
+- **Cyclone IV**: EP4CE115F29C7
+- **Cyclone V**: 5CEBA4F23C7
+
+Então, clique em **Next** e **Finish**.
+
+Após criar o projeto, para criar um arquivo de circuito em blocos, clique em **File**$\rightarrow$**New**
+$\rightarrow$**Block Diagram/Schematic File**. Após realizar alterações nesse arquivo, lembre-se de salvar
+com **CTRL+S**.
+
+Agora, clicando no símbolo de porta lógica na barra de ferramentas do Quartus, você pode adicionar um
+componente lógico no seu circuito. Basta escrever o nome da porta lógica na caixa de busca. Um número após
+o nome da porta lógica indica a quantidade de entradas (exemplos: *and2*, *and3*, *or2*, *not*, etc).
+
+[![Diagrama de Blocos](img/bd.jpg)](img/bd.jpg)
+
+(Explicar como adicionar entradas e saídas, compilar e programar a FPGA)
 
 ## 2. Simplificação de Expressão Lógica
 
@@ -207,7 +241,7 @@ para simplificá-la.
 
 A partir de agora, usaremos a notação $AB = A \cdot B$.
 
-Imediatamente, pela distributividade do produto
+**(!)** Imediatamente, pela distributividade do produto
 sobre a soma, ficamos com $AB + BBC + BCC$,
 que automaticamente simplifica pela propriedade "$xx = x$" para
 $AB+BC+BC$, e analogamente, pela proriedade 
@@ -297,7 +331,7 @@ novas funções para as válvulas, temos
 
 Daí ficamos finalmente com o seguinte circuito
 
-(fazer circuito completo)
+[![Circuito final do reservatório](img/reservatorio_final.png)](img/reservatorio_final.png)
 
 ## 4. Modelagem de Problema Prático 2: Electric Boogaloo
 
@@ -343,7 +377,7 @@ seguir:
 | 1 | 1 | 0 | 0  | 0  | 1  |
 | 1 | 1 | 1 | 1  | 0  | 0  |
 
-Dessa tabela podemos escrever manualmente uma expressão que satisfaz a
+**(!)** Dessa tabela podemos escrever manualmente uma expressão que satisfaz a
 coluna $CD$, que é $CD = \overline{D}\,\overline{E}\,F +
 \overline{D}\,E\,F + DEF$ (soma de produtos).
 Agora podemos simplificá-la. Distribuindo, temos $CD =
@@ -362,41 +396,45 @@ Assim, circuito final fica da seguinte forma:
 Passados os primeiros exemplos de circuitos lógicos, vamos para o
 primeiro componente que vamos precisar para exibir os valores
 numéricos nos componentes da ULA. A ideia do display hexadecimal de 7
-segmentos é converter um número binário da forma $ABCD$ em um dígito
-hexadecimal, isto é, um dígito que pode assumir 16 valores (0 até 9 e
-então A até F).
-
-[![Display](img/hex.jpg)](img/hex.jpg)
+segmentos é converter um número binário da forma $0bABCD$ em um dígito
+hexadecimal $0xH$, onde $H$ é um dígito que pode assumir 16 valores, indo de
+0 até 9 e então de A até F.
 
 Para representar o dígito hexadecimal, usaremos o display de 7
 segmentos disponível nas FPGAs Cyclone IV e V. A cada segmento do
 display associaremos uma função booliana que leva os dígitos binários
 de entrada ao sinal daquele segmento, de modo a desenhar todos os
-dígitos hexadecimais. Para atingir esse fim, será construída uma
-tabela-verdade com todos os valores possíveis para extrair a expressão
-algébrica dela; lembrando que teremos 4 inputs (números de 0 a 15
-são representados por 4 bits) e 7 outputs.
+dígitos hexadecimais possíveis. Para isso, primeiramente devemos construir uma
+tabela-verdade com todos os valores possíveis para $0bABCD$ e suas respectivas
+saídas, para que possamos construir os circuitos lógicos que representam cada
+uma das 7 funções de saída.
 
 [![Tabela do Display](img/7_display.png)](img/7_display.png)
 
-(adicionar tabela verdade e explicação do mapa de karnaugh).
+Uma vez que a simplificação algébrica de 7 funções binárias de 4 variáveis
+é um processo bastante longo e enfadonho, usaremos um método de simplificação
+mais rápido para obter as expressões algébricas simplificadas. Este é o método
+de *Mapas-K*, ou *Mapas de Karnaugh*. A descrição do método pode ser encontrada
+[nesta página](https://de-abreu.github.io/be-a-ba/) escrita por alunos da
+disciplina de Sistemas Digitais do ano de 2024.
 
-Para resolver essa tabela e extrair um circuito, são possíveis 2 
-soluções: a primeira é projetar uma matriz de inputs por outputs,
-sendo que cada output possui uma logic gate OR que receberá todos os inputs
-que ativam-no. A segunda, mais otimizada porém técnica, envolve
-usar o método de K-maps (mapa de Karnough), mencionado previamente.
+Daqui em diante, todos os passos de simplificação algébrica são omitidos e
+o leitor pode fazê-lo usando o método de Mapas-K.
 
-A explicação desse método é um pouco longa e demorada, então vale
-mais a pena aqui recomendar a leitura dele no site
-[Bê-á-Bá](https://de-abreu.github.io/be-a-ba/) da lógica digital,
-desenvolvido por veteranos da 024. Dado que você já tenha lido e
-entendido, provavelmente perceberá que será necessário fazer
-um mapa de 4 variáveis para cada um dos sete segmentos. Isso é
-um saco, mas é uma ótima maneira de praticar e ficar rápido nisso
-(o que você precisará, confie), então recomenda-se fazê-lo. Para 
-um gabarito, um site bom é o 
-[Electrical Technology](https://www.electricaltechnology.org/2018/05/bcd-to-7-segment-display-decoder.html)
+As expressões algébricas para cada um dos 7 segmentos $S_0$, $S_1$, ..., $S_6$, na
+ordem dos segmentos da FPGA, são:
+
+- $S_0 = A\overline{B}\,\overline{C} + \overline{A} BD + A\overline{D} + \overline{A}C + BC + \overline{B}\,\overline{D}$;
+- $S_1 = \overline{A}\,\overline{C}\,\overline{D}+\overline{A}CD+A\overline{C}D+\overline{B}\,\overline{C}+\overline{B}\,\overline{D}$;
+- $S_2 = \overline{A}\,\overline{C}+\overline{A}D+\overline{C}D+\overline{A}B+A\overline{B}$;
+- $S_3 = \overline{A}\,\overline{B}\,\overline{D}+\overline{B}CD+B\overline{C}D+BC\overline{D}+A\overline{C}$;
+- $S_4 = \overline{B}\,\overline{D} + C\overline{D} + AC + AB$;
+- $S_5 = \overline{A}B\overline{C}+\overline{C}\,\overline{D}+B\overline{D}+A\overline{B}+AC$;
+- $S_6 = \overline{A}B\overline{C}+\overline{B}C+C\overline{D}+A\overline{B}+AD$;
+
+Segue o diagrama gráfico do circuito (por [electronics-fun.com](https://electronics-fun.com)):
+
+[![Diagrama Display](img/seven_segment.png)](img/seven_segment.png)
 
 ## 6. Somador Completo
 
@@ -464,8 +502,8 @@ introduziremos a seguir e exploraremos um uso mais geral dessa nova
 função na próxima seção.
 
 O somador completo é uma função de três variáveis $FA(A,B,C_{in})$ que
-leva suas três variáveis na soma delas. A terceira variável $C_{in}$ é
-chamada de *carry_in*, por motivos que exploraremos melhor na próxima
+leva suas três variáveis no vetor $(C,S)$ (*Carry-out* e soma). A terceira variável $C_{in}$ é
+chamada de *Carry in* ($C_{in}$), por motivos que exploraremos melhor na próxima
 seção. A tabela verdade do somador completo é a seguinte:
 
 | $A$ | $B$ | $C_{in}$ | $C$ | $S$ |
@@ -479,26 +517,17 @@ seção. A tabela verdade do somador completo é a seguinte:
 |  1  |  1  |     0    |  1  |  0  |
 |  1  |  1  |     1    |  1  |  1  |
 
+Utilizando o métodos de Mapas-K, obtemos as seguintes expressões:
+
+- $S = A \oplus B \oplus C_{in}$;
+- $C = AC_{in}+AB+BC_{in}$;
+
+(imagem do circuito)
+
+Também é possivel escrever $FA$ em função de $HA$:
+
+(imagem do circuito com half adders)
+
 ## 7. Somador de 4 bits
 
-Esse será o primeiro projeto (na disciplina) em que você fará o design
-de um circuito que envolva um planejamento e projeção mais técnicos.
-Nada muito exorbitante, mas esse exemplo introduz como criar e 
-explorar sistemas maiores a partir de menores, o que é o dever
-de qualquer bom cientista da computação.
-
-Em suma, usaremos o bloco do Somador Completo como unidade de soma. 
-Para conseguir transformar um projeto em um bloco lógico no Quartus, siga 
-[este tutorial](https://youtube.com/watch?v=Z6iYVo8p9A0).
-A partir disso, nosso somador de 4 bits irá imitar o algoritmo básico
-de soma que aprendemos no fundamental I (e usamos até hoje): somamos
-os algarismos na mesma casa decimal (no nosso caso, binária), considerando
-carry-in da soma passada e propagando carry-out (se houver).
-
-Primeiro, é necessário criar um Full Adder. Ele nada mais é do que
-um Half Adder que suporta carry-in. Para tal fim, construa a TV com esse
-input adicionado e efetue o Karnough, e salve esse projeto. Depois disso,
-use o bloco lógico dele seguindo a lógica descrita no parágrafo anterior,
-terminando com um circuito com essa cara:
-
-[![4 Bits Adder](img/4-bit-adder.jpg.png)](img/4-bit-adder.jpg.png)
+(escrever)
