@@ -59,7 +59,7 @@ Enfim, enjoy it!
 4. [Modelagem de Problema Prático 2: Electric Boogaloo](#modelagem-de-problema-prático-2-electric-boogaloo)
 5. [Display Hexadecimal de 7 segmentos](#display-hexadecimal-de-7-segmentos)
 6. [Somador Completo](#somador-completo)
-7. [Somador de 4 bits](#7-somador-de-4-bits)
+7. [Somador de 4 bits](#somador-de-4-bits)
 
 
 ## 0. Pré-requisitos **(!)**
@@ -530,4 +530,38 @@ Também é possivel escrever $FA$ em função de $HA$:
 
 ## 7. Somador de 4 bits
 
-(escrever)
+Na última seção construímos um circuito somador que nos permite somar 3
+bits, então não é inesperado que em seguida tentassemos
+generalizar esta ideia para somarmos mais bits. De fato, o que
+queremos não é exatamente um circuito que nos permite somar $n$ bits,
+mas sim um circuito que nos permite somar 2 números binários, onde ambos
+possuem $n$ bits. Em particular, vamos olhar para o caso onde $n=4$, mas
+a ideia é a mesma para o caso mais geral.
+
+**(!)** Considere dois números inteiros positivos $A$ e $B$, e seja $n$ um
+número maior que ou igual ao número de bits suficiente para representar tanto
+$A$ quanto $B$ (isto é, $n \geq max\{\lceil log_2\,A\rceil, \lceil log_2\,B\rceil\})$.
+Temos que $A+B = (A_{n-1} \cdot 2^{n-1} + A_{n-2} \cdot 2^{n-2} + \cdots + A_1 \cdot 2 + A_0)+$
+$(B_{n-1} \cdot 2^{n-1} + B_{n-2} \cdot 2^{n-2} + \cdots + B_1 \cdot 2 + B_0)$ pode ser
+reescrito, usando as regras de associatividade e distributividade, na forma
+$A+B = (A_{n-1}+B_{n-1}) \cdot 2^{n-1} + (A_{n-2}+B_{n-2}) \cdot 2^{n-2} + \cdots +$
+$(A_1 + B_1) \cdot 2 + (A_0 + B_0)$.Ou seja, de fato, podemos somar o $i$-ésimo bit
+do primeiro operando com o $i$-ésimo bit do segundo operando para formar o $i$-ésimo
+bit da soma deles, com o detalhe de que devemos considerar a seguinte noção que vimos durante
+a motivação do *somador completo*, caso $(A_i+B_i)=2$, consideramos $(A+B)_i=0$ e
+$(A+B)_{i-1} = (A_{i-1} + B_{i-1}+1)$. Essa definição recursiva é uma generalização
+da noção de *carry* que vimos anteriormente. De fato, essa noção também é o mesmo princípio
+usado na soma longa de números em base 10 que é ensinada no ensino fundamental.
+
+Disso, podemos concluir que dados dois números de $n$ bits, podemos somá-los somando cada
+respectivo bit de cada um, e propagando o bit de *carry* da forma recursiva definida anteriormente.
+Isso é equivalente, na prática, a conectar $n$ somadores completos em série, onde o $i$-ésimo
+somador completo recebe como entradas os $i$-ésimos bits dos operandos, e o bit de *carry* do
+somador anterior. O primeiro somador completo recebe o bit $0$ como entrada de $C_{in}$. A soma
+de cada somador completo representará o respectivo bit da soma dos números de entrada. Caso o último
+somador completo emita um bit de *carry*, isso indica que $n$ bits não são suficientes para representar
+a soma dos números $(\lceil log_2(A+B) \rceil > n)$. Este caso será chamado de *overflow*.
+
+(imagem do circuito)
+
+
