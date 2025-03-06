@@ -475,10 +475,7 @@ mapas-K. Ficamos com o seguinte:
 	&C(A,B)=AB
 \end{align}
 
-O circuito final do half adder fica da seguinte forma:
-
-(adicionar imagem no quartus)
-[![Half Adder](img/half_adder.png)](img/hlf_adder.png)
+[![Somador Parcial](img/half_adder.jpg)](img/half_adder.jpg)
 
 **(!)** A ideia da função carry está relacionada com o sistema
 posicional de representação de números inteiros que estamos usando.
@@ -522,11 +519,11 @@ Utilizando o métodos de Mapas-K, obtemos as seguintes expressões:
 - $S = A \oplus B \oplus C_{in}$;
 - $C = AC_{in}+AB+BC_{in}$;
 
-(imagem do circuito)
+[![Somador Completo](img/full_adder.jpg)](img/full_adder.jpg)
 
 Também é possivel escrever $FA$ em função de $HA$:
 
-(imagem do circuito com half adders)
+[![Somador Completo com Somadores Parciais](img/full_adder_half.jpg)](img/full_adder_half.jpg)
 
 ## 7. Somador de 4 bits
 
@@ -563,5 +560,3 @@ somador completo emita um bit de *carry*, isso indica que $n$ bits não são suf
 a soma dos números $(\lceil log_2(A+B) \rceil > n)$. Este caso será chamado de *overflow*.
 
 (imagem do circuito)
-
-
