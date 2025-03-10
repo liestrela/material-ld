@@ -4,7 +4,8 @@ TODO:
 
 - [x] Imagens Pré-requisitos
 - [x] Falar de tabela verdade pré-requisitos
-- [ ] Configuração quartus
+- [x] Configuração quartus
+- [ ] Dicas quartus
 - [x] Imagens reservatório de água
 - [x] Imagens display 7 segmentos
 - [x] Explicação mapa de karnaugh display 7 segmentos

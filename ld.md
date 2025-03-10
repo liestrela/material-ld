@@ -61,6 +61,7 @@ Enfim, enjoy it!
 6. [Somador Completo](#somador-completo)
 7. [Somador de 4 bits](#somador-de-4-bits)
 
+Apêndice A. [Dicas sobre o Quartus](#a.-dicas-sobre-o-quartus)
 
 ## 0. Pré-requisitos **(!)**
 
@@ -218,13 +219,38 @@ Após criar o projeto, para criar um arquivo de circuito em blocos, clique em **
 $\rightarrow$**Block Diagram/Schematic File**. Após realizar alterações nesse arquivo, lembre-se de salvar
 com **CTRL+S**.
 
-Agora, clicando no símbolo de porta lógica na barra de ferramentas do Quartus, você pode adicionar um
-componente lógico no seu circuito. Basta escrever o nome da porta lógica na caixa de busca. Um número após
-o nome da porta lógica indica a quantidade de entradas (exemplos: *and2*, *and3*, *or2*, *not*, etc).
-
 [![Diagrama de Blocos](img/bd.jpg)](img/bd.jpg)
 
-(Explicar como adicionar entradas e saídas, compilar e programar a FPGA)
+Agora, clicando no símbolo de porta lógica na barra de ferramentas do Quartus, você pode usar a *Symbol Tool*
+para adicionar um componente lógico no seu circuito. Basta escrever o nome da porta lógica na caixa de busca. Um número após
+o nome da porta lógica indica a quantidade de entradas (exemplos: *and2*, *and3*, *or2*, *not*, etc).
+
+[![Symbol Tool](img/symbol_tool.jpg)](img/symbol_tool.jpg)
+
+Clicando no botão *Pin Tool* ao lado da *Symbol Tool*, você pode adicionar uma nova entrada ou saída no seu
+circuito. Uma única entrada desse tipo pode ser usada para representar múltiplos sinais. Mais detalhes sobre
+como fazer isso no [apêndice A.1](#a.-dicas-sobre-o-quartus).
+
+[![Pin Tool](img/pin_tool.jpg)](img/pin_tool.jpg)
+
+Para testar o seu circuito na FPGA, você deve primeiro sintetizá-lo e compilá-lo num formato que o Quartus pode
+escrever na FPGA. Para isso, clique no botão *Start Compilation* com ícone de play.
+
+[![Start Compilation](img/start_compile.jpg)](img/start_compile.jpg)
+
+Caso haja mais de um circuito no seu projeto, você pode usar a barra de navegação do projeto ao lado esquerdo da
+tela no modo *Files* para selecionar o circuito que deseja compilar, clicar com o botão direito e selecionar a opção
+*Set as top-level entity*.
+
+[![Top Level Entity](img/top_level_entity.jpg)](img/top_level_entity.jpg)
+
+Após o final da compilação, você deve escrever o programa na FPGA, usando a ferramenta *Programmer*. Para isso, selecione
+a ferramenta *Programmer* na barra superior do Quartus e selecione o driver *USB Blaster* para programação. Depois disso
+é só clicar no botão *Start* e esperar que o Quartus programe a FPGA com o circuito que você compilou.
+
+[![Programmer](img/programmer.jpg)](img/programmer.jpg)
+[![USB Blaster](img/usb-blaster.jpg)](img/usb-blaster.jpg)
+[![Start Programmer](img/start-programmer.jpg)](img/start-programmer.jpg)
 
 ## 2. Simplificação de Expressão Lógica
 
@@ -560,3 +586,59 @@ somador completo emita um bit de *carry*, isso indica que $n$ bits não são suf
 a soma dos números $(\lceil log_2(A+B) \rceil > n)$. Este caso será chamado de *overflow*.
 
 (imagem do circuito)
+
+## A. Dicas Sobre o Quartus
+
+O Quartus Prime pode ser um pouco duro às vezes, por isso, aqui está uma
+lista de dicas para facilitar o processo de desenvolver os circuitos
+e evitar bugs no Quartus.
+
+### 1. Abrindo o projeto de forma segura
+
+Evite abrir o Quartus Prime e então abrir o projeto atrás de **File**$\rightarrow$
+**Open Project**. É mais seguro acessar a pasta do seu projeto e clicar no ícone azul
+do arquivo **.qpf** (Quartus Project File) do seu projeto para abrir o Quartus com o
+seu projeto. Isso evita alguns bugs e crashes esporádicos no Quartus por motivos
+misteriosos.
+
+### 2. Fios sem-fio
+
+Em projetos que têm muitas conexões entre os blocos, o diagrama de blocos pode ficar
+bastante confuso e visualmente poluído. Uma maneira de mitigar isso é conectar blocos
+sem usar 'fios' diretamente. Para isso, crie um pequeno fio em cada um dos blocos que
+você deseja conectar, e então clique em cada um deles e dê um nome a eles (evite caracteres
+especiais). O nome dos dois fios deve ser o mesmo.
+
+(figura fio wifi)
+
+Ao fazer isso, a ferramenta de síntese
+do Quartus os conecta logicamente, mesmo que não haja um fio os conectando diretamente.
+
+### 3. Criando blocos
+
+Conforme os projetos ficam mais complexos, alguns circuitos são utilizados de forma repetida,
+por exemplo, num somador de $n$ bits $n$ somadores completos são utilizados. Para facilitar
+essa tarefa e tornar o projeto mais escalável, é possível transformar um diagrama de blocos
+num bloco em si, tornando-o acessível através de **Symbol Tool**. Para isso, com o diagrama
+de blocos aberto e salvo, clique em **File**$\rightarrow$**Create/Update**$\rightarrow$
+**Create Symbol Files for Current File** e salve o arquivo. Agora você pode usar a **Symbol
+Tool** para acessar o seu símbolo. **Importante**: Caso as entradas e/ou saídas do seu bloco
+sejam alteradas, é necessário repetir o processo para atualizar o símbolo do bloco.
+
+### 4. Vetores de entrada/saída
+
+É comum que um circuito possua múltiplas entradas que dizem respeito
+a uma só coisa, como por exemplo, num somador de 4 bits, as 4 entradas
+$a_0$, $a_1$, $a_2$ e $a_3$ dizem respeito ao primeiro operador da soma.
+O mesmo pode ocorrer para saídas. De fato, é possível 'agrupar' essas
+entradas/saídas em um único símbolo de entrada/saída utilizando vetores.
+
+(figura vetor)
+
+Para criar um vetor de entrada/saída no Quartus, basta nomear uma
+entrada/saída para *NOME[n-1..0]*, onde $n$ é o número de entradas
+que você precisa. Dessa maneira, você pode usar um *fio de barramento*
+para conectar essa entrada a outros símbolos que recebam entradas de
+$n$ elementos, ou então utilizar os [fios sem-fio](#fios-sem-fio) para
+utilizar somente uma das entrada (exemplo: nomear um fio de *NOME[0]*
+utiliza a primeira entrada do vetor *NOME*).
