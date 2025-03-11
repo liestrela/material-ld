@@ -3,9 +3,9 @@ title: Aritmética com Lógica Digital 101
 header-includes: <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
 ---
 
-Nesse texto pretendo dar uma introdução à implementação de circuitos
-lógicos simples, implementando os componentes de uma unidade lógica e
-aritmética, com um extra de um tutorial para implementação desses 
+Nesse texto pretendo dar uma primeira introdução à implementação de circuitos
+lógicos, implementando os componentes de uma unidade lógica e
+aritmética, com um tutorial extra para implementação desses 
 circuitos em
 [FPGAs](https://pt.wikipedia.org/wiki/Arranjo_de_porta_program%C3%A1vel_em_campo),
 dando uma  atenção exclusiva aos modelos Cyclone IV e V da Altera e fazendo toda a implementação no ambiente Intel Quartus Prime.
@@ -34,10 +34,10 @@ que vai bem além no assunto.
 
 **Aviso importante**: Muitos dos projetos do curso de Prática em Lógica Digital
 (além de uma boa porção da teoria) também são explicados em vídeos 
-gravados durante a pandemia de 2020 pelo professor Denis Wolf. Você pode assistir
+gravados durante a pandemia de 2020 pelo professor [Denis Wolf](https://sites.icmc.usp.br/denis/). Você pode assistir
 essas aulas [nesta playlist do YouTube](https://youtube.com/playlist?list=PL400nT9WA9li9LjGXqFKlHqRZxryRAomV).
 
-**Aviso importante$\mathbf{^2}$**: As seções do texto têm partes marcadas com **(!)**.
+**Aviso importante$\mathbf{^2}$**: Algumas seções do texto têm partes marcadas com **(!)**.
 Isso indica que essas partes explicam um pouco mais profundamente
 sobre aquele assunto/problema. Para os desesperados:
 podem pular esses parágrafos e seguir o texto como um tutorial
@@ -65,8 +65,7 @@ Apêndice A. [Dicas sobre o Quartus](#a.-dicas-sobre-o-quartus)
 
 ## 0. Pré-requisitos **(!)**
 
-Como já foi dito no prefácio do texto, os pré-requisitos para esse texto
-são conhecer e entender as operações aritméticas básicas (e a raíz quadrada)
+Os pré-requisitos para este texto são conhecer e entender as operações aritméticas básicas (e a raíz quadrada)
 e álgebra booliana instrumental. Esta seção tem como objetivo somente introduzir os
 conceitos básicos de álgebra booliana.
 
@@ -75,7 +74,7 @@ de regras que vale pra algumas operações no conjunto
 $\{0,1\}$. Daqui em diante, um elemento desse conjunto será chamado de *bit*,
 do inglês, *binary digit*. Essas regras são definidas de modo a "capturar" as principais
 propriedades de operações entre conjuntos (reunião, interseção e complemento). 
-No contexto de lógica digital, é mais comum usar os conectivos lógicos pra se referir a estas operações,
+No contexto de lógica digital, é mais comum usar os conectivos lógicos para se referir a estas operações,
 usando *OU/OR* para a reunião, *E/AND* para a interseção e *NÃO/NOT* para o complemento.
 
 [![OR](img/or.png)](img/or.png)
@@ -87,11 +86,12 @@ $B$ é o conjunto dos elementos que pertencem a $A$ **ou** a $B$, não
 exclusivamente (ou seja, o elemento pode pertencer aos dois), a
 interseção entre $A$ e $B$ é o conjunto dos elementos que pertencem a
 $A$ **e** a $B$ e o complemento de um conjunto $A$ é o conjunto dos
-elementos de um conjunto universo que **não** pertencem a $A$. Durante
-todo o texto vamos usar o símbolo $+$ pra representar a operação *OR*
+elementos de um conjunto universo que **não** pertencem a $A$.
+
+Durante todo o texto vamos usar o símbolo $+$ para representar a operação *OR*
 e o símbolo $\cdot$ pra representar a operação *AND*. O complementar
-de um valor $a$, ou seja, um valor aplicado na operação *NOT* será
-denotado por $\overline{a}$.
+de um valor $a$, ou seja, a operação *NOT* aplicada num valor $a$ será
+denotada por $\overline{a}$.
 
 A seguir estão as principais regras das operações citadas (você pode
 encontrá-las em qualquer livro de lógica digital).
@@ -110,7 +110,9 @@ Para todo bit $x$, vale:
 10. $x + \overline{x} = 1$
 11. $\overline{\overline{x}} = x$
 
-Na prática, a operação *NOT* inverte o valor de um bit.
+Na prática, a operação *NOT* inverte o valor de um bit, a operação *OR* retorna
+um bit $1$ somente quando qualquer um dos operandos é $1$ e a operação *AND* retorna
+um bit $1$ somente quando ambos os operandos são $1$.
 
 Note que para toda regra desse tipo, você pode
 trocar $0$ por $1$, $\cdot$ por $+$ e a regra continua
@@ -137,8 +139,8 @@ Para todos os bits $x$, $y$ e $z$, vale:
 Novamente, para cada uma dessas propriedades existe uma outra equivalente
 obtida através do princípio de dualidade.
 
-Esse modelo matemático é útil pra projetar circuitos digitais porque
-trabalheremos com sinais binários (aos quais se atribui os símbolos 0 e 1,
+Este modelo matemático é útil pra projetar circuitos digitais porque
+trabalharemos com sinais binários (aos quais se atribui os símbolos 0 e 1,
 por convenção), e o que se tem para trabalhar são as portas
 lógicas, que são componentes lógicos que têm o comportamento das operações
 que apresentamos. Daqui em diante, trataremos operações binárias e portas
@@ -156,7 +158,7 @@ comuns, acesse [a página da Wikipédia sobre portas lógicas](https://en.wikipe
 Daqui em diante, denotaremos $x \cdot y$ por $xy$.
 
 A principal aplicação destas definições que apresentamos é modelar a solução
-de uum problema usando funções boolianas, que são fundamentalmente combinações
+de um problema usando funções boolianas, que são fundamentalmente combinações
 destas operações que definimos sobre um número qualquer de variáveis com uma
 saída que satisfaça a solução de um determinado prolema. Através das propriedades
 das portas lógicas, podemos simplificar as expressões dessas funções, de modo a usar menos
@@ -167,13 +169,13 @@ simplificada.
 
 Dado um problema, o que deve ser feito primeiro é a separação de bits de entrada e 
 bits de saída. Cada saída será definida por uma função booliana, que pode ter como
-variáveis alguns dos bits de entrada ou não. Em seguida, uma maneira de organizar e
+variáveis alguns dos bits de entrada. Em seguida, uma maneira de organizar e
 determinar qual deve ser o comportamento de cada uma das funções de saída, pode-se usar
 uma ferramenta chamada *tabela-verdade*, que consiste em uma tabela com uma coluna para
 cada entrada e saída e $2^n$ linhas, onde $n$ é o número de entradas. O objetivo é preencher
 cada linha com uma combinação possível de entradas e descrever qual deve ser o valor de cada
 uma das saídas dada esta combinação de entrada. O número de linhas se dá pelo fato de que
-o número de combinação possíveis de $n$ bits é $2^n$ (princípio fundamental de contagem).
+o número de combinações possíveis de $n$ bits é $2^n$ (princípio fundamental de contagem).
 
 [![Exemplo de tabela verdade](img/truth_table.jpg)](img/truth_table.jpg)
 
@@ -187,7 +189,7 @@ AC(B+\overline{B})+AB\overline{C}$ (distributividade), então temos que $Z = AC+
 ## 1. Configuração do Quartus Prime
 
 Todos os circuitos que fizermos durante o texto serão projetados no Quartus Prime com o intuito
-de implementá-los nas FPGAs Cyclone IV e V disponíveis nos laboratórios do ICMC-6. O Quartus Prime
+de implementá-los nas FPGAs Cyclone IV e V disponíveis nos laboratórios do ICMC. O Quartus Prime
 é um software da Intel que possui ferramentas de design de circuitos lógicos em blocos e de sintetização
 desses circuitos, com extensões para as FPGAs Cyclone. Você pode baixar a versão gratuita do Quartus Prime 
 no [website da Intel](https://www.intel.com.br/content/www/br/pt/products/details/fpga/development-tools/quartus-prime/resource.html).
@@ -229,7 +231,7 @@ o nome da porta lógica indica a quantidade de entradas (exemplos: *and2*, *and3
 
 Clicando no botão *Pin Tool* ao lado da *Symbol Tool*, você pode adicionar uma nova entrada ou saída no seu
 circuito. Uma única entrada desse tipo pode ser usada para representar múltiplos sinais. Mais detalhes sobre
-como fazer isso no [apêndice A.1](#a.-dicas-sobre-o-quartus).
+como fazer isso no [apêndice A.4](#vetores-de-entradasaida).
 
 [![Pin Tool](img/pin_tool.jpg)](img/pin_tool.jpg)
 
@@ -435,32 +437,32 @@ tabela-verdade com todos os valores possíveis para $0bABCD$ e suas respectivas
 saídas, para que possamos construir os circuitos lógicos que representam cada
 uma das 7 funções de saída.
 
-[![Tabela do Display](img/7_display.png)](img/7_display.png)
-
 Uma vez que a simplificação algébrica de 7 funções binárias de 4 variáveis
 é um processo bastante longo e enfadonho, usaremos um método de simplificação
 mais rápido para obter as expressões algébricas simplificadas. Este é o método
 de *Mapas-K*, ou *Mapas de Karnaugh*. A descrição do método pode ser encontrada
-[nesta página](https://de-abreu.github.io/be-a-ba/) escrita por alunos da
+[nesta página](https://de-abreu.github.io/be-a-ba/docs/logica-combinacional/o-mapa-de-karnaugh) escrita por alunos da
 disciplina de Sistemas Digitais do ano de 2024.
 
 Daqui em diante, todos os passos de simplificação algébrica são omitidos e
 o leitor pode fazê-lo usando o método de Mapas-K.
 
-As expressões algébricas para cada um dos 7 segmentos $S_0$, $S_1$, ..., $S_6$, na
+**Muito importante**: os LEDs dos segmentos dos displays da FPGA são ativos em nível baixo,
+isto é, cada LED aceso deve ter o sinal $0$ e cada LED apagado deve ter o sinal $1$.
+Daí, as expressões algébricas para cada um dos 7 segmentos $S_0$, $S_1$, ..., $S_6$, na
 ordem dos segmentos da FPGA, são:
 
-- $S_0 = A\overline{B}\,\overline{C} + \overline{A} BD + A\overline{D} + \overline{A}C + BC + \overline{B}\,\overline{D}$;
-- $S_1 = \overline{A}\,\overline{C}\,\overline{D}+\overline{A}CD+A\overline{C}D+\overline{B}\,\overline{C}+\overline{B}\,\overline{D}$;
-- $S_2 = \overline{A}\,\overline{C}+\overline{A}D+\overline{C}D+\overline{A}B+A\overline{B}$;
-- $S_3 = \overline{A}\,\overline{B}\,\overline{D}+\overline{B}CD+B\overline{C}D+BC\overline{D}+A\overline{C}$;
-- $S_4 = \overline{B}\,\overline{D} + C\overline{D} + AC + AB$;
-- $S_5 = \overline{A}B\overline{C}+\overline{C}\,\overline{D}+B\overline{D}+A\overline{B}+AC$;
-- $S_6 = \overline{A}B\overline{C}+\overline{B}C+C\overline{D}+A\overline{B}+AD$;
+- $S_0 = AB\overline{C}D+A\overline{B}CD+\overline{A}B\overline{C}\,\overline{D}+\overline{A}\,\overline{B}\,\overline{C}D$;
+- $S_1 = AB\overline{D}+ACD+\overline{A}B\overline{C}D+BC\overline{D}$;
+- $S_2 = ABC+AB\overline{D}+\overline{A}\,\overline{B}C\overline{D}$;
+- $S_3 = A\overline{B}C\overline{D}+\overline{A}B\overline{C}\,\overline{D}+\overline{A}\,\overline{B}\,\overline{C}D+BCD$;
+- $S_4 = \overline{A}B\overline{C}+\overline{A}D+\overline{B}\,\overline{C}D$;
+- $S_5 = AB\overline{C}D+\overline{A}\,\overline{B}C+\overline{A}\,\overline{B}D+\overline{A}CD$;
+- $S_6 = AB\overline{C}\,\overline{D}+\overline{A}BCD+\overline{A}\,\overline{B}\,\overline{C}$;
 
-Segue o diagrama gráfico do circuito (por [electronics-fun.com](https://electronics-fun.com)):
-
-[![Diagrama Display](img/seven_segment.png)](img/seven_segment.png)
+Para evitar erros no desenho dos blocos, é recomendável desenhar duas linhas
+longas para cada entrada, uma invertida e a outra não, e então puxar os fios de cada
+termo da expressão algébrica para uma porta *OR* de várias entradas.
 
 ## 6. Somador Completo
 
@@ -585,7 +587,9 @@ de cada somador completo representará o respectivo bit da soma dos números de 
 somador completo emita um bit de *carry*, isso indica que $n$ bits não são suficientes para representar
 a soma dos números $(\lceil log_2(A+B) \rceil > n)$. Este caso será chamado de *overflow*.
 
-(imagem do circuito)
+[![Somador de 4 bits](img/4_bit_adder.jpg)](img/4_bit_adder.jpg)
+
+(demais seções em construção)...
 
 ## A. Dicas Sobre o Quartus
 
@@ -609,7 +613,7 @@ sem usar 'fios' diretamente. Para isso, crie um pequeno fio em cada um dos bloco
 você deseja conectar, e então clique em cada um deles e dê um nome a eles (evite caracteres
 especiais). O nome dos dois fios deve ser o mesmo.
 
-(figura fio wifi)
+[![Fio sem fio](img/fio_wifi.jpg)](img/fio_wifi.jpg)
 
 Ao fazer isso, a ferramenta de síntese
 do Quartus os conecta logicamente, mesmo que não haja um fio os conectando diretamente.
@@ -633,7 +637,7 @@ $a_0$, $a_1$, $a_2$ e $a_3$ dizem respeito ao primeiro operador da soma.
 O mesmo pode ocorrer para saídas. De fato, é possível 'agrupar' essas
 entradas/saídas em um único símbolo de entrada/saída utilizando vetores.
 
-(figura vetor)
+[![Entrada em vetor](img/vetor.jpg)](img/vetor.jpg)
 
 Para criar um vetor de entrada/saída no Quartus, basta nomear uma
 entrada/saída para *NOME[n-1..0]*, onde $n$ é o número de entradas
